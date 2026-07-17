@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Expo generated files
+.expo/
+dist/
+web-build/
+
+# Local environment files (keep the example committed)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Local instructions and supporting documents
+Instruções*
+Instrucoes*
+*.docx
+*.pdf
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,98 +1,109 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
+import { Link } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+import { Colors, EletroShopColors } from '@/constants/theme';
+import { BrandLogo } from '@/components/brand-logo';
 
 export default function HomeScreen() {
+  const scheme = useColorScheme();
+  const isDark = scheme === 'dark';
+  const theme = Colors[isDark ? 'dark' : 'light'];
+  const accent = isDark ? EletroShopColors.darkAccent : EletroShopColors.accent;
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+      <View style={styles.header}>
+        <BrandLogo compact textColor={theme.text} />
+      </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+      <View style={styles.content}>
+        <Image
+          source={require('@/assets/images/brand/eos-app-icon.png')}
+          style={styles.iconContainer}
+          contentFit="contain"
+        />
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        <Text style={[styles.eyebrow, { color: accent }]}>GESTÃO DE PRODUTOS</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Seu estoque, simples e conectado.</Text>
+        <Text style={[styles.description, { color: theme.textSecondary }]}>
+          Cadastre e organize os produtos da sua loja em um só lugar.
+        </Text>
+
+        <Link href="/create-product" style={[styles.primaryButton, { backgroundColor: accent }]}>
+          Cadastrar novo produto
+        </Link>
+      </View>
+
+      <Text style={[styles.footer, { color: theme.textSecondary }]}>EletroShop • Gerenciamento de produtos</Text>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    paddingHorizontal: 24,
   },
-  heroSection: {
+  header: {
     alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 10,
+    paddingVertical: 20,
+  },
+  content: {
+    alignItems: 'center',
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    justifyContent: 'center',
+    marginHorizontal: 'auto',
+    maxWidth: 620,
+    paddingBottom: 48,
+    width: '100%',
+  },
+  iconContainer: {
+    height: 112,
+    marginBottom: 30,
+    width: 112,
+  },
+  eyebrow: {
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 1.8,
+    marginBottom: 14,
   },
   title: {
+    fontSize: 42,
+    fontWeight: '900',
+    letterSpacing: -1.2,
+    lineHeight: 48,
+    maxWidth: 560,
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
+  description: {
+    fontSize: 18,
+    lineHeight: 27,
+    marginTop: 18,
+    maxWidth: 480,
+    textAlign: 'center',
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  primaryButton: {
+    borderRadius: 12,
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
+    marginTop: 34,
+    overflow: 'hidden',
+    paddingHorizontal: 28,
+    paddingVertical: 16,
+    textAlign: 'center',
+  },
+  footer: {
+    fontSize: 12,
+    paddingBottom: 16,
+    textAlign: 'center',
   },
 });
