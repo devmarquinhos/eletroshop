@@ -1,7 +1,7 @@
 import type { CreateProductInput } from '@/types/product';
 
 export type ProductFormErrors = Partial<
-  Record<'name' | 'price' | 'quantity', string>
+  Record<'name' | 'description' | 'category' | 'price' | 'quantity', string>
 >;
 
 type ProductFormValues = {
@@ -40,6 +40,12 @@ export function validateProductForm(
   const quantity = parseQuantity(values.quantity);
 
   if (!values.name.trim()) errors.name = 'Informe o nome do produto.';
+  if (!values.description.trim()) {
+    errors.description = 'Informe a descrição do produto.';
+  }
+  if (!values.category.trim()) {
+    errors.category = 'Informe a categoria do produto.';
+  }
 
   if (!values.price.trim()) {
     errors.price = 'Informe o preço do produto.';

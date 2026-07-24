@@ -10,6 +10,7 @@ Aplicativo mobile de gerenciamento de produtos desenvolvido colaborativamente co
 - filtros por categoria e disponibilidade;
 - atualização manual da lista;
 - cache local usado quando a API está indisponível;
+- consulta e limpeza dos produtos armazenados localmente;
 - visualização dos detalhes de um produto;
 - suporte aos modos claro e escuro.
 
@@ -55,7 +56,7 @@ O módulo também usa estados para:
 
 ## Validações
 
-- nome e preço são obrigatórios;
+- nome, descrição, categoria e preço são obrigatórios;
 - preço deve ser igual ou maior que zero e ter no máximo duas casas decimais;
 - quantidade deve ser um número inteiro igual ou maior que zero;
 - valores como `20abc`, `2.5` para quantidade e números negativos são recusados.
@@ -91,13 +92,19 @@ Copy-Item .env.example .env
 Configure o endereço:
 
 ```env
-EXPO_PUBLIC_API_URL=http://localhost:3000
+EXPO_PUBLIC_API_URL=http://localhost:8080
 ```
 
 Em um celular físico, use o endereço IPv4 do computador na mesma rede:
 
 ```env
-EXPO_PUBLIC_API_URL=http://192.168.1.10:3000
+EXPO_PUBLIC_API_URL=http://192.168.1.10:8080
+```
+
+No emulador Android padrão, utilize o endereço reservado para o computador:
+
+```env
+EXPO_PUBLIC_API_URL=http://10.0.2.2:8080
 ```
 
 Endpoint utilizado:
@@ -175,6 +182,7 @@ Rotas disponíveis:
 /                         Home
 /create-product           Cadastro
 /products                 Listagem
+/local-products           Produtos armazenados localmente
 /products/[id]            Detalhes
 /products/[id]/edit       Edição
 ```
@@ -196,16 +204,14 @@ A partir dela, o usuário pode:
 - abrir a edição;
 - excluir o produto depois de uma confirmação.
 
-A edição envia todos os campos modificáveis para `PATCH /products/:id`. A
+A edição envia todos os campos modificáveis para `PUT /products/:id`. A
 disponibilidade não é enviada pelo formulário, pois deve ser recalculada pela
 API.
 
 Depois da edição, a aplicação retorna aos detalhes atualizados. Depois da
 exclusão, retorna à listagem, que consulta novamente a API ao receber foco.
 
-Os cartões “Consulta à API” e “Produtos locais” já estão representados na Home,
-mas o cartão de produtos locais permanece desabilitado até a integração da
-Equipe 5.
+Os cartões de consulta à API e produtos locais estão integrados à Home.
 
 ## Equipe 4 — Comunicação com a API
 
@@ -237,6 +243,34 @@ deleteProduct(id);
 
 O código-fonte, a documentação e as instruções de execução do backend
 permanecem no repositório externo da API.
+
+## Equipe 5 — Armazenamento local
+
+A rota `/local-products` apresenta a `LocalProductsScreen` e carrega somente a
+cópia armazenada no AsyncStorage.
+
+A tela:
+
+- identifica claramente que os produtos apresentados são locais;
+- utiliza `FlatList` e o componente `ProductItem`;
+- apresenta estados de carregamento, erro e lista vazia;
+- permite tentar novamente quando a leitura falha;
+- solicita confirmação antes de limpar os dados;
+- atualiza imediatamente a lista depois da limpeza;
+- informa que a limpeza local não exclui produtos da API.
+
+O serviço `src/services/productStorage.ts` disponibiliza:
+
+```ts
+saveProductsLocally(products);
+loadProductsLocally();
+clearLocalProducts();
+```
+
+Os produtos são convertidos com `JSON.stringify` antes da gravação e
+recuperados com `JSON.parse`. A listagem principal atualiza essa cópia sempre
+que recebe uma nova lista da API e utiliza os dados locais como fallback quando
+o serviço está temporariamente indisponível.
 
 ## Navegação após o cadastro
 
