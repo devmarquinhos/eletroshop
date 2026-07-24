@@ -9,19 +9,30 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#1A1D29',
+    background: '#F5F7FA',
+    backgroundElement: '#FFFFFF',
+    backgroundSelected: '#E2E5EB',
+    textSecondary: '#6B7280',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#F5F7FA',
+    background: '#0F1117',
+    backgroundElement: '#1A1D29',
+    backgroundSelected: '#263149',
+    textSecondary: '#A7AFBF',
   },
+} as const;
+
+export const EletroShopColors = {
+  primary: '#0052FF',
+  primaryDark: '#0038B8',
+  accent: '#FF6B00',
+  success: '#00C853',
+  danger: '#E53935',
+  border: '#E2E5EB',
+  darkPrimary: '#3D7FFF',
+  darkAccent: '#FF8533',
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
