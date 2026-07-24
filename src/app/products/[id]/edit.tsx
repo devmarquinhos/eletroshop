@@ -1,1 +1,1 @@
-export { default } from '@/screens/EditProductScreen';
+export { EditProductScreen as default } from '@/screens/EditProductScreen';

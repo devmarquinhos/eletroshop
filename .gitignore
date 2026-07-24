@@ -13,6 +13,8 @@ web-build/
 !.env.example
 
 # Local instructions and supporting documents
+AGENTS.md
+CLAUDE.md
 Instruções*
 Instrucoes*
 *.docx

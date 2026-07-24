@@ -7,7 +7,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -15,7 +14,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { BrandLogo } from '@/components/brand-logo';
+import { styles } from './styles';
+
+import { BrandLogo } from '@/components/BrandLogo';
 import { Colors, EletroShopColors } from '@/constants/theme';
 import { getProductById, updateProduct } from '@/services/productApi';
 import { loadProductsLocally } from '@/services/productStorage';
@@ -25,7 +26,7 @@ import {
   validateProductForm,
 } from '@/utils/productValidation';
 
-export default function EditProductScreen() {
+export function EditProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const scheme = useColorScheme();
@@ -210,27 +211,45 @@ export default function EditProductScreen() {
             />
             <ErrorText message={errors.name} />
 
-            <FieldLabel text="Descrição" color={theme.text} />
+            <FieldLabel text="Descrição *" color={theme.text} />
             <TextInput
               value={description}
-              onChangeText={setDescription}
+              onChangeText={(value) => {
+                setDescription(value);
+                setErrors((current) => ({
+                  ...current,
+                  description: undefined,
+                }));
+              }}
               placeholder="Características e especificações"
               placeholderTextColor={theme.textSecondary}
-              style={[inputStyle, styles.textArea]}
+              style={[
+                inputStyle,
+                styles.textArea,
+                errors.description && styles.inputError,
+              ]}
               multiline
               numberOfLines={4}
               editable={!saving}
             />
+            <ErrorText message={errors.description} />
 
-            <FieldLabel text="Categoria" color={theme.text} />
+            <FieldLabel text="Categoria *" color={theme.text} />
             <TextInput
               value={category}
-              onChangeText={setCategory}
+              onChangeText={(value) => {
+                setCategory(value);
+                setErrors((current) => ({
+                  ...current,
+                  category: undefined,
+                }));
+              }}
               placeholder="Ex.: Informática"
               placeholderTextColor={theme.textSecondary}
-              style={inputStyle}
+              style={[inputStyle, errors.category && styles.inputError]}
               editable={!saving}
             />
+            <ErrorText message={errors.category} />
 
             <View style={styles.row}>
               <View style={styles.column}>
@@ -297,104 +316,3 @@ function FieldLabel({ text, color }: { text: string; color: string }) {
 function ErrorText({ message }: { message?: string }) {
   return message ? <Text style={styles.fieldError}>{message}</Text> : null;
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  container: { flex: 1 },
-  content: {
-    marginHorizontal: 'auto',
-    maxWidth: 760,
-    padding: 24,
-    paddingBottom: 48,
-    width: '100%',
-  },
-  centered: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  loadingText: { marginTop: 12 },
-  backLink: {
-    alignSelf: 'flex-start',
-    marginTop: 18,
-    paddingVertical: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '900',
-    letterSpacing: -0.6,
-    marginTop: 12,
-  },
-  subtitle: {
-    lineHeight: 21,
-    marginBottom: 22,
-    marginTop: 6,
-  },
-  inlineWarning: {
-    color: '#8A3B00',
-    marginBottom: 12,
-  },
-  form: {
-    borderRadius: 16,
-    padding: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 7,
-    marginTop: 14,
-  },
-  input: {
-    borderRadius: 10,
-    borderWidth: 1,
-    fontSize: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-  },
-  inputError: {
-    borderColor: EletroShopColors.danger,
-    borderWidth: 1.5,
-  },
-  fieldError: {
-    color: EletroShopColors.danger,
-    fontSize: 12,
-    marginTop: 5,
-  },
-  textArea: {
-    minHeight: 96,
-    textAlignVertical: 'top',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  column: { flex: 1 },
-  saveButton: {
-    alignItems: 'center',
-    borderRadius: 10,
-    justifyContent: 'center',
-    marginTop: 28,
-    minHeight: 52,
-  },
-  retryButton: {
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
-  disabled: { opacity: 0.6 },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-  },
-  errorTitle: {
-    color: EletroShopColors.danger,
-    fontSize: 22,
-    fontWeight: '800',
-  },
-  errorMessage: {
-    marginBottom: 20,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-});
