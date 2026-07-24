@@ -2,6 +2,17 @@
 
 Aplicativo mobile de gerenciamento de produtos desenvolvido colaborativamente com React Native, Expo 57 e Expo Router.
 
+## Funcionalidades integradas
+
+- página inicial da EletroShop;
+- cadastro de produtos;
+- listagem carregada da API;
+- filtros por categoria e disponibilidade;
+- atualização manual da lista;
+- cache local usado quando a API está indisponível;
+- visualização dos detalhes de um produto;
+- suporte aos modos claro e escuro.
+
 ## Equipe 1 — Cadastro de produtos
 
 A Equipe 1 é responsável pela rota `/create-product` e pela tela `CreateProductScreen`.
@@ -131,9 +142,32 @@ npx expo start
 
 Use `w` para web, `a` para o emulador Android ou leia o QR Code com o Expo Go.
 
+## Equipe 2 — Listagem de produtos
+
+A rota `/products` utiliza `ProductListScreen`, `ProductItem`, `FlatList` e o hook `useProducts`.
+
+No carregamento inicial, o hook:
+
+1. procura a última lista salva no AsyncStorage;
+2. apresenta essa lista temporariamente, quando disponível;
+3. consulta `GET /products`;
+4. atualiza a tela com os dados da API;
+5. salva a nova lista localmente.
+
+Quando a API falha e existe uma cópia local, a aplicação mantém os produtos na tela e informa que os dados podem estar desatualizados.
+
+A listagem permite:
+
+- filtrar por categoria;
+- mostrar somente produtos disponíveis;
+- atualizar arrastando a lista;
+- tentar novamente depois de um erro;
+- cadastrar um novo produto;
+- selecionar um item para visualizar seus detalhes.
+
 ## Navegação após o cadastro
 
-Depois da confirmação, a tela retorna para a rota que abriu o formulário. Quando o cadastro for acessado pela futura tela de listagem, o usuário retornará automaticamente para ela. Se não existir histórico de navegação, o aplicativo retorna à Home.
+Depois da confirmação, a aplicação abre `/products`. A listagem é carregada novamente e passa a apresentar os dados atualizados da API.
 
 ## Pendência externa
 

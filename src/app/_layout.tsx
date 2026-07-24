@@ -10,6 +10,8 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="create-product" />
+        <Stack.Screen name="products/index" />
+        <Stack.Screen name="products/[id]" />
       </Stack>
     </ThemeProvider>
   );

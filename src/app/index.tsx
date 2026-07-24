@@ -37,6 +37,11 @@ export default function HomeScreen() {
         <Link href="/create-product" style={[styles.primaryButton, { backgroundColor: accent }]}>
           Cadastrar novo produto
         </Link>
+        <Link
+          href="/products"
+          style={[styles.secondaryButton, { borderColor: EletroShopColors.primary, color: theme.text }]}>
+          Ver produtos
+        </Link>
       </View>
 
       <Text style={[styles.footer, { color: theme.textSecondary }]}>EletroShop • Gerenciamento de produtos</Text>
@@ -99,6 +104,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: 28,
     paddingVertical: 16,
+    textAlign: 'center',
+  },
+  secondaryButton: {
+    borderRadius: 12,
+    borderWidth: 1.5,
+    fontSize: 16,
+    fontWeight: '800',
+    marginTop: 12,
+    overflow: 'hidden',
+    paddingHorizontal: 28,
+    paddingVertical: 14,
     textAlign: 'center',
   },
   footer: {

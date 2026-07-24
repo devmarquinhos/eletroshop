@@ -99,12 +99,7 @@ export default function CreateProductScreen() {
         {
           text: 'OK',
           onPress: () => {
-            if (router.canGoBack()) {
-              router.back();
-              return;
-            }
-
-            router.replace('/');
+            router.replace('/products');
           },
         },
       ]);

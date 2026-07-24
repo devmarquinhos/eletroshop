@@ -16,7 +16,7 @@ export class ProductApiError extends Error {
   }
 }
 
-function isProduct(value: unknown): value is Product {
+export function isProduct(value: unknown): value is Product {
   if (!value || typeof value !== 'object') return false;
 
   const product = value as Record<string, unknown>;
@@ -40,18 +40,18 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
-export async function createProduct(product: CreateProductInput): Promise<Product> {
+async function requestJson(path: string, init?: RequestInit): Promise<unknown> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`${PRODUCT_API_URL}/products`, {
-      method: 'POST',
+    const response = await fetch(`${PRODUCT_API_URL}${path}`, {
+      ...init,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        ...init?.headers,
       },
-      body: JSON.stringify(product),
       signal: controller.signal,
     });
 
@@ -66,10 +66,6 @@ export async function createProduct(product: CreateProductInput): Promise<Produc
       throw new ProductApiError(message, response.status);
     }
 
-    if (!isProduct(body)) {
-      throw new ProductApiError('A API retornou um produto em formato inválido.');
-    }
-
     return body;
   } catch (error) {
     if (error instanceof ProductApiError) throw error;
@@ -82,4 +78,37 @@ export async function createProduct(product: CreateProductInput): Promise<Produc
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export async function getProducts(): Promise<Product[]> {
+  const body = await requestJson('/products');
+
+  if (!Array.isArray(body) || !body.every(isProduct)) {
+    throw new ProductApiError('A API retornou uma lista de produtos em formato inválido.');
+  }
+
+  return body;
+}
+
+export async function getProductById(id: string): Promise<Product> {
+  const body = await requestJson(`/products/${encodeURIComponent(id)}`);
+
+  if (!isProduct(body)) {
+    throw new ProductApiError('A API retornou um produto em formato inválido.');
+  }
+
+  return body;
+}
+
+export async function createProduct(product: CreateProductInput): Promise<Product> {
+  const body = await requestJson('/products', {
+    method: 'POST',
+    body: JSON.stringify(product),
+  });
+
+  if (!isProduct(body)) {
+    throw new ProductApiError('A API retornou um produto em formato inválido.');
+  }
+
+  return body;
 }
