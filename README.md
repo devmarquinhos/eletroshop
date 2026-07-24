@@ -204,7 +204,39 @@ Depois da edição, a aplicação retorna aos detalhes atualizados. Depois da
 exclusão, retorna à listagem, que consulta novamente a API ao receber foco.
 
 Os cartões “Consulta à API” e “Produtos locais” já estão representados na Home,
-mas permanecem desabilitados até a integração das telas das Equipes 4 e 5.
+mas o cartão de produtos locais permanece desabilitado até a integração da
+Equipe 5.
+
+## Equipe 4 — Comunicação com a API
+
+A rota `/api-products` apresenta a `ApiProductsScreen`. Diferentemente da
+listagem principal, essa tela consulta somente a API e não utiliza o cache
+local como fallback.
+
+Ela apresenta:
+
+- produtos retornados por `GET /products`;
+- estado da conexão;
+- endereço da API configurada;
+- horário da última resposta;
+- carregamento inicial;
+- erros da conexão;
+- botão para tentar novamente;
+- atualização por botão ou gesto de arrastar;
+- acesso aos detalhes do produto.
+
+O serviço `src/services/productApi.ts` disponibiliza:
+
+```ts
+getProducts();
+getProductById(id);
+createProduct(product);
+updateProduct(id, product);
+deleteProduct(id);
+```
+
+O código-fonte, a documentação e as instruções de execução do backend
+permanecem no repositório externo da API.
 
 ## Navegação após o cadastro
 

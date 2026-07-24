@@ -73,6 +73,7 @@ export default function HomeScreen() {
             cardColor={theme.backgroundElement}
           />
           <HomeAction
+            href="/api-products"
             icon="⌁"
             title="Consulta à API"
             description="Acesso direto aos dados retornados pela API."
