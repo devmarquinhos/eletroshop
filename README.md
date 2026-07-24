@@ -165,6 +165,47 @@ A listagem permite:
 - cadastrar um novo produto;
 - selecionar um item para visualizar seus detalhes.
 
+## Equipe 3 — Navegação, detalhes e edição
+
+A navegação utiliza o `Stack` do Expo Router, compatível com o Expo SDK 57.
+
+Rotas disponíveis:
+
+```text
+/                         Home
+/create-product           Cadastro
+/products                 Listagem
+/products/[id]            Detalhes
+/products/[id]/edit       Edição
+```
+
+A tela de detalhes recebe o identificador pela rota dinâmica, consulta
+`GET /products/:id` e apresenta:
+
+- nome;
+- descrição;
+- categoria;
+- preço;
+- quantidade;
+- disponibilidade;
+- identificador.
+
+A partir dela, o usuário pode:
+
+- voltar para a listagem;
+- abrir a edição;
+- excluir o produto depois de uma confirmação.
+
+A edição envia todos os campos modificáveis para `PATCH /products/:id`. A
+disponibilidade não é enviada pelo formulário, pois deve ser recalculada pela
+API.
+
+Depois da edição, a aplicação retorna aos detalhes atualizados. Depois da
+exclusão, retorna à listagem, que consulta novamente a API ao receber foco.
+
+Os cartões “Consulta à API” e “Produtos locais” já estão representados na Home,
+mas permanecem desabilitados até a integração das telas das Equipes 4 e 5.
+
 ## Navegação após o cadastro
 
 Depois da confirmação, a aplicação abre `/products`. A listagem é carregada novamente e passa a apresentar os dados atualizados da API.

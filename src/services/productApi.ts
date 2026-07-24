@@ -1,4 +1,8 @@
-import type { CreateProductInput, Product } from '@/types/product';
+import type {
+  CreateProductInput,
+  Product,
+  UpdateProductInput,
+} from '@/types/product';
 
 const REQUEST_TIMEOUT_MS = 10_000;
 
@@ -61,7 +65,7 @@ async function requestJson(path: string, init?: RequestInit): Promise<unknown> {
       const message =
         body && typeof body === 'object' && 'message' in body
           ? String(body.message)
-          : `Não foi possível cadastrar o produto (${response.status}).`;
+          : `A solicitação falhou (${response.status}).`;
 
       throw new ProductApiError(message, response.status);
     }
@@ -111,4 +115,26 @@ export async function createProduct(product: CreateProductInput): Promise<Produc
   }
 
   return body;
+}
+
+export async function updateProduct(
+  id: string,
+  product: UpdateProductInput,
+): Promise<Product> {
+  const body = await requestJson(`/products/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(product),
+  });
+
+  if (!isProduct(body)) {
+    throw new ProductApiError('A API retornou um produto em formato inválido.');
+  }
+
+  return body;
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  await requestJson(`/products/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
 }

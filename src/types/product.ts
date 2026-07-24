@@ -9,3 +9,5 @@ export interface Product {
 }
 
 export type CreateProductInput = Omit<Product, 'id' | 'available'>;
+
+export type UpdateProductInput = CreateProductInput;

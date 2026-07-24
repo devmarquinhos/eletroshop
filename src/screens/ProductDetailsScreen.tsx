@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandLogo } from '@/components/brand-logo';
 import { Colors, EletroShopColors } from '@/constants/theme';
-import { getProductById } from '@/services/productApi';
+import { deleteProduct, getProductById } from '@/services/productApi';
 import { loadProductsLocally } from '@/services/productStorage';
 import type { Product } from '@/types/product';
 
@@ -31,6 +32,7 @@ export default function ProductDetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLocalData, setIsLocalData] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const loadProduct = useCallback(async () => {
     if (!id) {
@@ -73,6 +75,42 @@ export default function ProductDetailsScreen() {
   useEffect(() => {
     void loadProduct();
   }, [loadProduct]);
+
+  async function handleDelete() {
+    if (!id || deleting) return;
+
+    try {
+      setDeleting(true);
+      await deleteProduct(id);
+      Alert.alert('Produto excluído', 'O produto foi removido com sucesso.', [
+        { text: 'OK', onPress: () => router.replace('/products') },
+      ]);
+    } catch (deleteError) {
+      Alert.alert(
+        'Não foi possível excluir',
+        deleteError instanceof Error
+          ? deleteError.message
+          : 'Verifique a conexão e tente novamente.',
+      );
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  function confirmDelete() {
+    Alert.alert(
+      'Excluir produto?',
+      `Essa ação removerá “${product?.name ?? 'este produto'}” da API e não poderá ser desfeita.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: () => void handleDelete(),
+        },
+      ],
+    );
+  }
 
   if (loading) {
     return (
@@ -174,6 +212,37 @@ export default function ProductDetailsScreen() {
             <Text style={[styles.description, { color: theme.text }]}>
               {product.description || 'Nenhuma descrição informada.'}
             </Text>
+          </View>
+
+          <View style={styles.actions}>
+            <Pressable
+              accessibilityRole="button"
+              disabled={deleting}
+              onPress={() =>
+                router.push({
+                  pathname: '/products/[id]/edit',
+                  params: { id: product.id },
+                })
+              }
+              style={[
+                styles.editButton,
+                { backgroundColor: EletroShopColors.primary },
+                deleting && styles.disabled,
+              ]}>
+              <Text style={styles.primaryButtonText}>Editar produto</Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              disabled={deleting}
+              onPress={confirmDelete}
+              style={[styles.deleteButton, deleting && styles.disabled]}>
+              {deleting ? (
+                <ActivityIndicator color={EletroShopColors.danger} />
+              ) : (
+                <Text style={styles.deleteButtonText}>Excluir produto</Text>
+              )}
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -293,6 +362,34 @@ const styles = StyleSheet.create({
     lineHeight: 23,
     marginTop: 8,
   },
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 28,
+  },
+  editButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 50,
+    paddingHorizontal: 16,
+  },
+  deleteButton: {
+    alignItems: 'center',
+    borderColor: EletroShopColors.danger,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 50,
+    paddingHorizontal: 16,
+  },
+  deleteButtonText: {
+    color: EletroShopColors.danger,
+    fontWeight: '800',
+  },
+  disabled: { opacity: 0.6 },
   errorTitle: {
     color: EletroShopColors.danger,
     fontSize: 22,

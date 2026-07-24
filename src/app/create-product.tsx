@@ -18,24 +18,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, EletroShopColors } from '@/constants/theme';
 import { BrandLogo } from '@/components/brand-logo';
 import { createProduct } from '@/services/productApi';
-
-type FormErrors = Partial<Record<'name' | 'price' | 'quantity', string>>;
-
-function parsePrice(value: string) {
-  const normalized = value.trim().replace(',', '.');
-  if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;
-
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-}
-
-function parseQuantity(value: string) {
-  const normalized = value.trim();
-  if (!/^\d+$/.test(normalized)) return null;
-
-  const parsed = Number(normalized);
-  return Number.isSafeInteger(parsed) ? parsed : null;
-}
+import {
+  ProductFormErrors,
+  validateProductForm,
+} from '@/utils/productValidation';
 
 export default function CreateProductScreen() {
   const router = useRouter();
@@ -48,26 +34,8 @@ export default function CreateProductScreen() {
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('0');
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<ProductFormErrors>({});
   const [loading, setLoading] = useState(false);
-
-  function validate() {
-    const nextErrors: FormErrors = {};
-    const parsedPrice = parsePrice(price);
-    const parsedQuantity = parseQuantity(quantity);
-
-    if (!name.trim()) nextErrors.name = 'Informe o nome do produto.';
-    if (!price.trim()) nextErrors.price = 'Informe o preço do produto.';
-    else if (parsedPrice === null) nextErrors.price = 'Use um preço igual ou maior que zero, com até 2 casas decimais.';
-    if (parsedQuantity === null) nextErrors.quantity = 'Use um número inteiro igual ou maior que zero.';
-
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0 || parsedPrice === null || parsedQuantity === null) {
-      return null;
-    }
-
-    return { parsedPrice, parsedQuantity };
-  }
 
   function clearForm() {
     setName('');
@@ -81,18 +49,22 @@ export default function CreateProductScreen() {
   async function handleRegister() {
     if (loading) return;
 
-    const values = validate();
-    if (!values) return;
+    const validation = validateProductForm({
+      name,
+      description,
+      category,
+      price,
+      quantity,
+    });
+
+    if (!validation.data) {
+      setErrors(validation.errors);
+      return;
+    }
 
     try {
       setLoading(true);
-      await createProduct({
-        name: name.trim(),
-        description: description.trim(),
-        category: category.trim(),
-        price: values.parsedPrice,
-        quantity: values.parsedQuantity,
-      });
+      await createProduct(validation.data);
 
       clearForm();
       Alert.alert('Produto cadastrado', 'O produto foi salvo com sucesso.', [

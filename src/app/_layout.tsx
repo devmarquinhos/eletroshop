@@ -12,6 +12,7 @@ export default function RootLayout() {
         <Stack.Screen name="create-product" />
         <Stack.Screen name="products/index" />
         <Stack.Screen name="products/[id]" />
+        <Stack.Screen name="products/[id]/edit" />
       </Stack>
     </ThemeProvider>
   );
