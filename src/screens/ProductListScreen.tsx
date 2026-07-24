@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useProducts } from '@/hooks/use-products';
 import {
   ActivityIndicator,
   Pressable,
@@ -8,62 +8,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { mockProducts } from '@/mocks/products';
-import type { Product } from '@/types/product';
-import {
-  getStoredProducts,
-  saveProducts,
-} from '@/storage/productStorage';
 
 export default function ProductListScreen() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const loadProducts = useCallback(async (isRefresh = false) => {
-  try {
-    if (isRefresh) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
-
-    setError(null);
-
-    if (!isRefresh) {
-      const storedProducts = await getStoredProducts();
-
-      if (storedProducts.length > 0) {
-        setProducts(storedProducts);
-        setLoading(false);
-      }
-    }
-
-    // Simula o tempo de resposta da futura API.
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Temporário: será substituído por getProducts().
-    const loadedProducts = mockProducts;
-
-    setProducts(loadedProducts);
-    await saveProducts(loadedProducts);
-  } catch (caughtError) {
-    console.error('Erro ao carregar produtos:', caughtError);
-    setError('Não foi possível carregar os produtos.');
-  } finally {
-    setLoading(false);
-    setRefreshing(false);
-  }
-}, []);
-
-  useEffect(() => {
-    void loadProducts();
-  }, [loadProducts]);
-
-  function handleRefresh() {
-    void loadProducts(true);
-  }
+  const {
+  products,
+  loading,
+  error,
+  refreshing,
+  reloadProducts,
+  refreshProducts,
+} = useProducts();
 
   if (loading && products.length === 0) {
     return (
@@ -89,7 +44,7 @@ export default function ProductListScreen() {
         </ThemedText>
 
         <Pressable
-          onPress={() => void loadProducts()}
+          onPress={() => void reloadProducts()}
           style={({ pressed }) => [
             styles.retryButton,
             pressed && styles.buttonPressed,
@@ -125,7 +80,7 @@ export default function ProductListScreen() {
 
         <Pressable
           disabled={refreshing}
-          onPress={handleRefresh}
+          onPress={() => void refreshProducts()}
           style={({ pressed }) => [
             styles.refreshButton,
             (pressed || refreshing) && styles.buttonPressed,
