@@ -26,7 +26,7 @@ function parsePrice(value: string) {
   if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;
 
   const parsed = Number(normalized);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
 function parseQuantity(value: string) {
@@ -58,7 +58,7 @@ export default function CreateProductScreen() {
 
     if (!name.trim()) nextErrors.name = 'Informe o nome do produto.';
     if (!price.trim()) nextErrors.price = 'Informe o preço do produto.';
-    else if (parsedPrice === null) nextErrors.price = 'Use um preço maior que zero, com até 2 casas decimais.';
+    else if (parsedPrice === null) nextErrors.price = 'Use um preço igual ou maior que zero, com até 2 casas decimais.';
     if (parsedQuantity === null) nextErrors.quantity = 'Use um número inteiro igual ou maior que zero.';
 
     setErrors(nextErrors);
@@ -96,7 +96,17 @@ export default function CreateProductScreen() {
 
       clearForm();
       Alert.alert('Produto cadastrado', 'O produto foi salvo com sucesso.', [
-        { text: 'OK', onPress: () => router.replace('/') },
+        {
+          text: 'OK',
+          onPress: () => {
+            if (router.canGoBack()) {
+              router.back();
+              return;
+            }
+
+            router.replace('/');
+          },
+        },
       ]);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Verifique a conexão e tente novamente.';

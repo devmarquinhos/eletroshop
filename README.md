@@ -1,56 +1,146 @@
-# Welcome to your Expo app 👋
+# EletroShop
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo mobile de gerenciamento de produtos desenvolvido colaborativamente com React Native, Expo 57 e Expo Router.
 
-## Get started
+## Equipe 1 — Cadastro de produtos
 
-1. Install dependencies
+A Equipe 1 é responsável pela rota `/create-product` e pela tela `CreateProductScreen`.
 
-   ```bash
-   npm install
-   ```
+O formulário permite informar:
 
-2. Start the app
+- nome;
+- descrição;
+- categoria;
+- preço;
+- quantidade em estoque.
 
-   ```bash
-   npx expo start
-   ```
+O identificador e a disponibilidade não são informados pelo usuário. Esses campos devem ser gerados pela API.
 
-In the output, you'll find options to open the app in a
+## Como o `useState` é utilizado
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Cada campo possui um estado controlado:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```ts
+const [name, setName] = useState('');
+const [description, setDescription] = useState('');
+const [category, setCategory] = useState('');
+const [price, setPrice] = useState('');
+const [quantity, setQuantity] = useState('0');
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Durante a digitação, `onChangeText` recebe o novo texto e chama a função de atualização correspondente:
 
-### Other setup steps
+```tsx
+<TextInput value={name} onChangeText={setName} />
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+O valor permanece como texto enquanto o usuário digita. No cadastro, preço e quantidade são validados e convertidos para `number` antes do envio à API.
 
-## Learn more
+O módulo também usa estados para:
 
-To learn more about developing your project with Expo, look at the following resources:
+- erros de validação;
+- bloqueio do botão durante o envio;
+- indicador de carregamento.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Validações
 
-## Join the community
+- nome e preço são obrigatórios;
+- preço deve ser igual ou maior que zero e ter no máximo duas casas decimais;
+- quantidade deve ser um número inteiro igual ou maior que zero;
+- valores como `20abc`, `2.5` para quantidade e números negativos são recusados.
 
-Join our community of developers creating universal apps.
+## Contrato do produto
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```ts
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  quantity: number;
+  available: boolean;
+}
+```
+
+O cadastro envia apenas:
+
+```ts
+type CreateProductInput = Omit<Product, 'id' | 'available'>;
+```
+
+## Configuração da API
+
+Copie o arquivo de exemplo:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Configure o endereço:
+
+```env
+EXPO_PUBLIC_API_URL=http://localhost:3000
+```
+
+Em um celular físico, use o endereço IPv4 do computador na mesma rede:
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.10:3000
+```
+
+Endpoint utilizado:
+
+```http
+POST /products
+Content-Type: application/json
+```
+
+Exemplo de requisição:
+
+```json
+{
+  "name": "Notebook Gamer",
+  "description": "Notebook com 16 GB de memória RAM",
+  "category": "Computadores",
+  "price": 4599.9,
+  "quantity": 5
+}
+```
+
+Resposta esperada:
+
+```json
+{
+  "id": "produto-1",
+  "name": "Notebook Gamer",
+  "description": "Notebook com 16 GB de memória RAM",
+  "category": "Computadores",
+  "price": 4599.9,
+  "quantity": 5,
+  "available": true
+}
+```
+
+## Execução
+
+```powershell
+npm install
+npx expo start
+```
+
+Use `w` para web, `a` para o emulador Android ou leia o QR Code com o Expo Go.
+
+## Navegação após o cadastro
+
+Depois da confirmação, a tela retorna para a rota que abriu o formulário. Quando o cadastro for acessado pela futura tela de listagem, o usuário retornará automaticamente para ela. Se não existir histórico de navegação, o aplicativo retorna à Home.
+
+## Pendência externa
+
+O funcionamento completo depende da API mantida em outro repositório. O aplicativo trata:
+
+- respostas HTTP sem sucesso;
+- mensagens de erro devolvidas em JSON;
+- resposta de produto em formato inválido;
+- falha de conexão;
+- tempo de resposta superior a dez segundos.

@@ -1,4 +1,4 @@
-export type Product = {
+export interface Product {
   id: string;
   name: string;
   description: string;
@@ -6,9 +6,6 @@ export type Product = {
   price: number;
   quantity: number;
   available: boolean;
-};
+}
 
-export type CreateProductInput = Pick<
-  Product,
-  'name' | 'description' | 'category' | 'price' | 'quantity'
->;
+export type CreateProductInput = Omit<Product, 'id' | 'available'>;
