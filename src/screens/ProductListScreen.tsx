@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Switch,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // npm install @react-native-picker/picker
+import { Picker } from '@react-native-picker/picker'; 
 import { useFocusEffect, useRouter } from 'expo-router';
 
 import { Product } from '../types/Product';
@@ -17,8 +17,6 @@ import ProductItem from '../components/ProductItem';
 import { getProducts } from '../services/productApi'; // fornecido pela Equipe 4
 import { saveProductsLocally } from '../services/productStorage'; // fornecido pela Equipe 5
 
-// Ajustem essa lista de categorias conforme o que a turma definir,
-// ou substituam por algo dinâmico (ex.: extraído dos próprios produtos).
 const CATEGORIAS = ['Todas', 'Áudio', 'Wearables', 'Acessórios', 'Periféricos'];
 
 export default function ProductListScreen() {
@@ -63,11 +61,7 @@ export default function ProductListScreen() {
   });
 
   const handleSelectProduct = (product: Product) => {
-    // Ajustem o nome da rota conforme o arquivo criado pela Equipe 3
-    // dentro de src/app (ex.: src/app/product-details.tsx)
     router.push({
-      // Cast temporário: remova o "as any" quando a Equipe 3 criar o
-      // arquivo de rota (ex.: src/app/product-details.tsx)
       pathname: '/product-details' as any,
       params: { productId: product.id },
     });
