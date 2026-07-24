@@ -10,6 +10,10 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { mockProducts } from '@/mocks/products';
 import type { Product } from '@/types/product';
+import {
+  getStoredProducts,
+  saveProducts,
+} from '@/storage/productStorage';
 
 export default function ProductListScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -18,28 +22,40 @@ export default function ProductListScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const loadProducts = useCallback(async (isRefresh = false) => {
-    try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-      setError(null);
-
-      // Simula o tempo de resposta da futura API.
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Temporário: será substituído por getProducts().
-      setProducts(mockProducts);
-    } catch (caughtError) {
-      console.error('Erro ao carregar produtos:', caughtError);
-      setError('Não foi possível carregar os produtos.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+  try {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
     }
-  }, []);
+
+    setError(null);
+
+    if (!isRefresh) {
+      const storedProducts = await getStoredProducts();
+
+      if (storedProducts.length > 0) {
+        setProducts(storedProducts);
+        setLoading(false);
+      }
+    }
+
+    // Simula o tempo de resposta da futura API.
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Temporário: será substituído por getProducts().
+    const loadedProducts = mockProducts;
+
+    setProducts(loadedProducts);
+    await saveProducts(loadedProducts);
+  } catch (caughtError) {
+    console.error('Erro ao carregar produtos:', caughtError);
+    setError('Não foi possível carregar os produtos.');
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+}, []);
 
   useEffect(() => {
     void loadProducts();
