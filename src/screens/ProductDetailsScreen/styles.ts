@@ -18,10 +18,18 @@ export const styles = StyleSheet.create({
     padding: 24,
   },
   loadingText: { marginTop: 12 },
-  backLink: {
-    alignSelf: 'flex-start',
-    marginTop: 24,
-    paddingVertical: 8,
+  successNotice: {
+    backgroundColor: '#E9F9EF',
+    borderColor: EletroShopColors.success,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginTop: 16,
+    padding: 12,
+  },
+  successNoticeText: {
+    color: '#087A37',
+    fontSize: 13,
+    fontWeight: '800',
   },
   localNotice: {
     backgroundColor: '#FFF3E8',

@@ -17,6 +17,7 @@ import { styles } from './styles';
 
 import { Colors, EletroShopColors } from '@/constants/theme';
 import { BrandLogo } from '@/components/BrandLogo';
+import { BackButton } from '@/components/BackButton';
 import { createProduct } from '@/services/productApi';
 import {
   ProductFormErrors,
@@ -67,14 +68,10 @@ export function CreateProductScreen() {
       await createProduct(validation.data);
 
       clearForm();
-      Alert.alert('Produto cadastrado', 'O produto foi salvo com sucesso.', [
-        {
-          text: 'OK',
-          onPress: () => {
-            router.replace('/products');
-          },
-        },
-      ]);
+      router.replace({
+        pathname: '/products',
+        params: { status: 'created' },
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Verifique a conexão e tente novamente.';
       Alert.alert('Não foi possível cadastrar', message);
@@ -96,6 +93,7 @@ export function CreateProductScreen() {
           <View style={styles.brandRow}>
             <BrandLogo compact textColor={theme.text} />
           </View>
+          <BackButton />
 
           <Text style={[styles.title, { color: theme.text }]}>Cadastrar produto</Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Adicione um novo item ao catálogo da loja.</Text>

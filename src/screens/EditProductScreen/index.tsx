@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './styles';
 
 import { BrandLogo } from '@/components/BrandLogo';
+import { BackButton } from '@/components/BackButton';
 import { Colors, EletroShopColors } from '@/constants/theme';
 import { getProductById, updateProduct } from '@/services/productApi';
 import { loadProductsLocally } from '@/services/productStorage';
@@ -113,17 +114,10 @@ export function EditProductScreen() {
       setSaving(true);
       setErrors({});
       await updateProduct(id, validation.data);
-
-      Alert.alert('Produto atualizado', 'As alterações foram salvas com sucesso.', [
-        {
-          text: 'OK',
-          onPress: () =>
-            router.replace({
-              pathname: '/products/[id]',
-              params: { id },
-            }),
-        },
-      ]);
+      router.replace({
+        pathname: '/products/[id]',
+        params: { id, status: 'updated' },
+      });
     } catch (error) {
       Alert.alert(
         'Não foi possível atualizar',
@@ -139,6 +133,7 @@ export function EditProductScreen() {
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <ActivityIndicator size="large" color={EletroShopColors.primary} />
         <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
           Carregando produto...
@@ -150,6 +145,7 @@ export function EditProductScreen() {
   if (!name && loadError) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <Text style={styles.errorTitle}>Não foi possível editar</Text>
         <Text style={[styles.errorMessage, { color: theme.textSecondary }]}>
           {loadError}
@@ -158,9 +154,6 @@ export function EditProductScreen() {
           onPress={() => void loadProduct()}
           style={[styles.retryButton, { backgroundColor: EletroShopColors.primary }]}>
           <Text style={styles.buttonText}>Tentar novamente</Text>
-        </Pressable>
-        <Pressable onPress={() => router.back()} style={styles.backLink}>
-          <Text style={{ color: EletroShopColors.primary }}>Voltar</Text>
         </Pressable>
       </View>
     );
@@ -184,9 +177,7 @@ export function EditProductScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled">
           <BrandLogo compact textColor={theme.text} />
-          <Pressable onPress={() => router.back()} style={styles.backLink}>
-            <Text style={{ color: EletroShopColors.primary }}>← Cancelar edição</Text>
-          </Pressable>
+          <BackButton label="Cancelar edição" />
 
           <Text style={[styles.title, { color: theme.text }]}>Editar produto</Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>

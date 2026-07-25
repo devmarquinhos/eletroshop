@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './styles';
 
 import { BrandLogo } from '@/components/BrandLogo';
+import { BackButton } from '@/components/BackButton';
 import { ProductItem } from '@/components/ProductItem';
 import { Colors, EletroShopColors } from '@/constants/theme';
 import { getProducts, PRODUCT_API_URL } from '@/services/productApi';
@@ -66,6 +67,7 @@ export function ApiProductsScreen() {
   if (loading && products.length === 0) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <ActivityIndicator size="large" color={EletroShopColors.primary} />
         <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
           Consultando a API...
@@ -92,9 +94,7 @@ export function ApiProductsScreen() {
         ListHeaderComponent={
           <View>
             <BrandLogo compact textColor={theme.text} />
-            <Pressable onPress={() => router.back()} style={styles.backLink}>
-              <Text style={{ color: EletroShopColors.primary }}>← Voltar</Text>
-            </Pressable>
+            <BackButton />
 
             <Text style={[styles.title, { color: theme.text }]}>
               Consulta direta à API

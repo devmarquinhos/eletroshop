@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandLogo } from '@/components/BrandLogo';
+import { BackButton } from '@/components/BackButton';
 import { ProductItem } from '@/components/ProductItem';
 import { Colors, EletroShopColors } from '@/constants/theme';
 import {
@@ -94,6 +95,7 @@ export function LocalProductsScreen() {
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <ActivityIndicator size="large" color={EletroShopColors.primary} />
         <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
           Carregando produtos locais...
@@ -112,13 +114,7 @@ export function LocalProductsScreen() {
         ListHeaderComponent={
           <View>
             <BrandLogo compact textColor={theme.text} />
-
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.back()}
-              style={styles.backLink}>
-              <Text style={styles.backLinkText}>← Voltar</Text>
-            </Pressable>
+            <BackButton />
 
             <Text style={[styles.title, { color: theme.text }]}>
               Produtos armazenados

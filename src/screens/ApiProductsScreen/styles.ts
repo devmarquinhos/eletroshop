@@ -18,11 +18,6 @@ export const styles = StyleSheet.create({
     padding: 24,
   },
   loadingText: { marginTop: 12 },
-  backLink: {
-    alignSelf: 'flex-start',
-    marginTop: 18,
-    paddingVertical: 8,
-  },
   title: {
     fontSize: 30,
     fontWeight: '900',

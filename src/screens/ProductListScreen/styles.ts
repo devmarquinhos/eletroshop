@@ -22,6 +22,19 @@ export const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
   },
+  successNotice: {
+    backgroundColor: '#E9F9EF',
+    borderColor: EletroShopColors.success,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginTop: 16,
+    padding: 12,
+  },
+  successNoticeText: {
+    color: '#087A37',
+    fontSize: 13,
+    fontWeight: '800',
+  },
   titleRow: {
     alignItems: 'center',
     flexDirection: 'row',

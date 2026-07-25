@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -14,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './styles';
 
 import { BrandLogo } from '@/components/BrandLogo';
+import { BackButton } from '@/components/BackButton';
 import { Colors, EletroShopColors } from '@/constants/theme';
 import { deleteProduct, getProductById } from '@/services/productApi';
 import { loadProductsLocally } from '@/services/productStorage';
@@ -25,7 +27,10 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 });
 
 export function ProductDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, status } = useLocalSearchParams<{
+    id: string;
+    status?: string;
+  }>();
   const router = useRouter();
   const scheme = useColorScheme();
   const theme = Colors[scheme === 'dark' ? 'dark' : 'light'];
@@ -73,9 +78,11 @@ export function ProductDetailsScreen() {
     }
   }, [id]);
 
-  useEffect(() => {
-    void loadProduct();
-  }, [loadProduct]);
+  useFocusEffect(
+    useCallback(() => {
+      void loadProduct();
+    }, [loadProduct]),
+  );
 
   async function handleDelete() {
     if (!id || deleting) return;
@@ -83,9 +90,10 @@ export function ProductDetailsScreen() {
     try {
       setDeleting(true);
       await deleteProduct(id);
-      Alert.alert('Produto excluído', 'O produto foi removido com sucesso.', [
-        { text: 'OK', onPress: () => router.replace('/products') },
-      ]);
+      router.replace({
+        pathname: '/products',
+        params: { status: 'deleted' },
+      });
     } catch (deleteError) {
       Alert.alert(
         'Não foi possível excluir',
@@ -99,9 +107,18 @@ export function ProductDetailsScreen() {
   }
 
   function confirmDelete() {
+    const message = `Essa ação removerá “${product?.name ?? 'este produto'}” da API e não poderá ser desfeita.`;
+
+    if (Platform.OS === 'web') {
+      if (window.confirm(`Excluir produto?\n\n${message}`)) {
+        void handleDelete();
+      }
+      return;
+    }
+
     Alert.alert(
       'Excluir produto?',
-      `Essa ação removerá “${product?.name ?? 'este produto'}” da API e não poderá ser desfeita.`,
+      message,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -116,6 +133,7 @@ export function ProductDetailsScreen() {
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <ActivityIndicator size="large" color={EletroShopColors.primary} />
         <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
           Carregando produto...
@@ -127,6 +145,7 @@ export function ProductDetailsScreen() {
   if (!product) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <Text style={styles.errorTitle}>Produto não encontrado</Text>
         <Text style={[styles.errorMessage, { color: theme.textSecondary }]}>
           {error}
@@ -135,9 +154,6 @@ export function ProductDetailsScreen() {
           onPress={() => void loadProduct()}
           style={[styles.primaryButton, { backgroundColor: EletroShopColors.primary }]}>
           <Text style={styles.primaryButtonText}>Tentar novamente</Text>
-        </Pressable>
-        <Pressable onPress={() => router.back()} style={styles.backLink}>
-          <Text style={{ color: EletroShopColors.primary }}>Voltar</Text>
         </Pressable>
       </View>
     );
@@ -149,10 +165,15 @@ export function ProductDetailsScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <BrandLogo compact textColor={theme.text} />
+        <BackButton label="Voltar para produtos" />
 
-        <Pressable onPress={() => router.back()} style={styles.backLink}>
-          <Text style={{ color: EletroShopColors.primary }}>← Voltar para produtos</Text>
-        </Pressable>
+        {status === 'updated' && (
+          <View style={styles.successNotice}>
+            <Text style={styles.successNoticeText}>
+              Produto atualizado com sucesso.
+            </Text>
+          </View>
+        )}
 
         {isLocalData && (
           <View style={styles.localNotice}>

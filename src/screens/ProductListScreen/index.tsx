@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   FlatList,
@@ -15,12 +15,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './styles';
 
 import { BrandLogo } from '@/components/BrandLogo';
+import { BackButton } from '@/components/BackButton';
 import { ProductItem } from '@/components/ProductItem';
 import { Colors, EletroShopColors } from '@/constants/theme';
 import { useProducts } from '@/hooks/use-products';
 
 export function ProductListScreen() {
   const router = useRouter();
+  const { status } = useLocalSearchParams<{ status?: string }>();
   const scheme = useColorScheme();
   const theme = Colors[scheme === 'dark' ? 'dark' : 'light'];
   const accent =
@@ -70,6 +72,7 @@ export function ProductListScreen() {
   if (loading && products.length === 0) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <ActivityIndicator size="large" color={EletroShopColors.primary} />
         <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
           Carregando produtos...
@@ -81,6 +84,7 @@ export function ProductListScreen() {
   if (error && products.length === 0) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <BackButton />
         <Text style={styles.errorTitle}>Erro ao carregar</Text>
         <Text style={[styles.errorMessage, { color: theme.textSecondary }]}>
           {error}
@@ -117,6 +121,17 @@ export function ProductListScreen() {
         ListHeaderComponent={
           <View>
             <BrandLogo compact textColor={theme.text} />
+            <BackButton />
+
+            {(status === 'created' || status === 'deleted') && (
+              <View style={styles.successNotice}>
+                <Text style={styles.successNoticeText}>
+                  {status === 'created'
+                    ? 'Produto cadastrado com sucesso.'
+                    : 'Produto excluído com sucesso.'}
+                </Text>
+              </View>
+            )}
 
             <View style={styles.titleRow}>
               <View style={styles.titleText}>
